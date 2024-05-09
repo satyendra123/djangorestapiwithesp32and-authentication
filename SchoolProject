@@ -1,3 +1,7 @@
+#Note if the ip is change or esp32 http post the data due to wifi working on dhcp my ip will change. so we need to check my ip then the same ip we will write in http post and get method. and we will run the
+# mydjango rest_framework with the same ip and port. and also we need to set the ip in settings.py host allowed. after doing that much my data will be received and stored in the database
+
+
 #this is my main project folder. django-admin startproject SchoolProject
 #Step-1 SchoolProject/urls.py
 from django.contrib import admin
