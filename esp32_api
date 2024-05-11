@@ -67,6 +67,7 @@ from . import views
 urlpatterns = [
     path('update/', views.sensor_data_view, name='update_sensor_data'),
     #path('get/', views.get_sensor_data, name='get_sensor_data'),
+    path('boom/', views.boom_sig_view, name='update_boom_sig'),
 ]
 
 #step-5 esp32/views.py
