@@ -6,6 +6,8 @@ class Esp32ApiConfig(AppConfig):
 
 #step-2 esp32/models.py
 from django.db import models
+
+# Create your models here.
 class SensorData(models.Model):
     device_id = models.CharField(max_length=50)
     sensor_type = models.CharField(max_length=50)
@@ -14,6 +16,15 @@ class SensorData(models.Model):
 
     def __str__(self):
         return f"{self.device_id} - {self.sensor_type}"
+
+class BoomSig(models.Model):
+    entry_boom = models.CharField(max_length=50)
+    entry_last_sync = models.DateTimeField()
+    exit_boom_sig = models.CharField(max_length=50)
+    exit_last_sync = models.DateTimeField()
+
+    def __str__(self):
+        return f"Entry Boom: {self.entry_boom}, Exit Boom: {self.exit_boom_sig}"
 
 #Step-3 esp32/serializers.py
 '''
@@ -26,11 +37,16 @@ class SensorData(serializers.Serializer):
 '''
 
 from rest_framework import serializers
-from .models import SensorData
+from .models import SensorData, BoomSig
 
 class SensorDataSerializer(serializers.ModelSerializer):
     class Meta:
         model = SensorData
+        fields = '__all__'
+
+class BoomSigSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = BoomSig
         fields = '__all__'
 
 #step-4 esp32/urls.py
