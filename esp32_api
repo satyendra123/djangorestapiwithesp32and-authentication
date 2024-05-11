@@ -75,6 +75,10 @@ urlpatterns = [
 # after that i will get my ip so in this ip only i will send the http post request with the port. and i will run my django rest framework code in the same
 #ip address and port. and with that settings you will see the data is received in the database
 
+#Note- remeber one thing firstly your laptop and the esp32 would be connected with the same network. in my case it is wifi so i have cheked my laptop ip by writing the ipconfig in the cmd
+# after that i will get my ip so in this ip only i will send the http post request with the port. and i will run my django rest framework code in the same
+#ip address and port. and with that settings you will see the data is received in the database
+
 #EXAMPLE-1 is code me humne postman se data send karke check kiya tha ki database me data store ho rha hai yaa nahi postman me hit krne ke bad
 '''
 from django.shortcuts import render
@@ -121,12 +125,14 @@ def sensor_data_view(request):
         return Response({'error': 'Invalid data format'}, status=status.HTTP_400_BAD_REQUEST)
 
 '''
-#this is live testing code. i have tested it and the data is stored in the database. just remeber the one thing. firstly 
+#this is live testing code. i have tested it and the data is stored in the database. just remeber the one thing. firstly means i am sending the data from esp32 and the data is stored in the database
 from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
-from .models import SensorData
+from .models import SensorData, BoomSig
 from .serializers import SensorDataSerializer
+from django.http import HttpResponse
+import json
 
 @api_view(['POST'])
 def sensor_data_view(request):
@@ -144,3 +150,20 @@ def sensor_data_view(request):
         return Response({'message': 'Data received and saved successfully'}, status=status.HTTP_200_OK)
     else:
         return Response({'error': 'Invalid data format'}, status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(['GET'])
+def boom_sig_view(request):
+    boomsig_entry = BoomSig.objects.latest('id')
+    if boomsig_entry.entry_boom == 'Y':
+        response_data = {
+            'status': 'success',
+            'message': 'Relay activated successfully'
+        }
+    else:
+        response_data = {
+            'status': 'error',
+            'message': 'Entry boom is not activated'
+        }
+
+    # Send the JSON response
+    return HttpResponse(json.dumps(response_data), content_type="application/json")
