@@ -684,3 +684,116 @@ while True:
     loop()
 
 */
+//EXAMPLE-5 this is the esp32 code with DHT sensor and django rest api to store the data into the database
+#include <WiFi.h>
+#include <HTTPClient.h>
+#include <ArduinoJson.h>
+
+const char* ssid = "Airtel_tejv_3002";
+const char* password = "air73137";
+
+const char* device_id = "Device0001";
+const char* postUrl = "http://192.168.1.16:1880/update-sensor/";
+const char* getUrl = "http://192.168.1.24:8000/esp32/boom/";
+
+#define LED_PIN 2  // GPIO 2 for the built-in LED
+
+void setup() {
+  Serial.begin(115200);
+  pinMode(LED_PIN, OUTPUT);
+  digitalWrite(LED_PIN, LOW);
+  setup_wifi();
+}
+
+void loop() {
+  HTTP_POST(postUrl, "Temperature", 22.4);
+  HTTP_POST(postUrl, "Humidity", 34);
+  HTTP_GET(getUrl);
+  delay(1000);
+}
+
+void setup_wifi() {
+  Serial.println();
+  Serial.print("Connecting to ");
+  Serial.println(ssid);
+
+  WiFi.begin(ssid, password);
+
+  while (WiFi.status() != WL_CONNECTED) {
+    delay(500);
+    Serial.print(".");
+  }
+
+  Serial.println("");
+  Serial.println("WiFi connected");
+  Serial.println("IP address: ");
+  Serial.println(WiFi.localIP());
+}
+
+void HTTP_POST(const char* url, const char* type, float value) {
+  if (WiFi.status() == WL_CONNECTED) {
+    HTTPClient http;
+    http.begin(url);
+    http.addHeader("Content-Type", "application/json");
+
+    DynamicJsonDocument jsonBuffer(256);
+    jsonBuffer["device_id"] = device_id;
+    jsonBuffer["type"] = type;
+    jsonBuffer["value"] = value;
+
+    String jsonData;
+    serializeJson(jsonBuffer, jsonData);
+
+    int httpResponseCode = http.POST(jsonData);
+
+    if (httpResponseCode > 0) {
+      String response = http.getString();
+      Serial.println(response);
+      
+      DynamicJsonDocument jsonResponse(256);
+      deserializeJson(jsonResponse, response);
+
+      if (jsonResponse["relay"] == "OPENEN") {
+        digitalWrite(LED_PIN, HIGH);
+        delay(1000);
+        digitalWrite(LED_PIN, LOW);
+      }
+    } else {
+      Serial.print("Error on sending POST: ");
+      Serial.println(httpResponseCode);
+    }
+    http.end();
+  } else {
+    Serial.println("WiFi Disconnected");
+  }
+}
+
+void HTTP_GET(const char* url) {
+  if (WiFi.status() == WL_CONNECTED) {
+    HTTPClient http;
+    http.begin(url);
+
+    int httpResponseCode = http.GET();
+
+    if (httpResponseCode > 0) {
+      String response = http.getString();
+      Serial.println(response);
+
+      DynamicJsonDocument jsonResponse(256);
+      deserializeJson(jsonResponse, response);
+
+      if (jsonResponse["status"] == "success") {
+        digitalWrite(LED_PIN, HIGH);
+        delay(1000);
+        digitalWrite(LED_PIN, LOW);
+      }
+    } else {
+      Serial.print("Error on sending GET: ");
+      Serial.println(httpResponseCode);
+    }
+    http.end();
+  } else {
+    Serial.println("WiFi Disconnected");
+  }
+}
+
