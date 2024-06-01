@@ -1,6 +1,5 @@
 //Step-1 first make a flask server which sends the static data status="success" and "data": "LED should toggle" to my esp32
 from flask import Flask, jsonify
-
 app = Flask(__name__)
 
 @app.route('/esp32/boom/', methods=['GET'])
@@ -14,7 +13,7 @@ def handle_get():
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=8000)
 
-//Step-2 esp32.ino
+//Step-2 esp32.ino code micropython
 from machine import Pin
 from time import sleep
 import network
