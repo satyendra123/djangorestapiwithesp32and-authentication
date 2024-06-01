@@ -1,3 +1,5 @@
+Note: remember one thing. we can't check it through the postman without running the server. after running the server only like flask and python django we can test it with the postman.
+
 //Step-1 first make a flask server which sends the static data status="success" and "data": "LED should toggle" to my esp32
 from flask import Flask, jsonify
 app = Flask(__name__)
