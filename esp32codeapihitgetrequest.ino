@@ -26,7 +26,7 @@ device_id = "Device0001"
 ssid = "Redmi10"
 password = "abcd1234"
 
-HTTPS_GET_URL = "http://192.168.178.76:8000/esp32/boom/"
+HTTPS_GET_URL = "http://192.168.178.76:8000/esp32/boom/"        #use your system ip
 
 LED_PIN = 2  # GPIO 2 for the built-in LED
 
